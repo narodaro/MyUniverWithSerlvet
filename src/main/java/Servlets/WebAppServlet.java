@@ -1,8 +1,8 @@
 package Servlets;
 
 import dao.StudentDAO;
-import dao.StudentsMarkDAO;
-import dao.SubjectsDAO;
+import dao.StudentsMarksDAO;
+import dao.SubjectDAO;
 import dto.StudentDTO;
 import dto.StudentsMarksDTO;
 import dto.SubjectDTO;
@@ -22,8 +22,10 @@ public class WebAppServlet extends HttpServlet {
         response.setContentType("text/html;charset=utf-8");
 
         StudentDAO studentDAO = new StudentDAO();
-        SubjectsDAO subjectDAO = new SubjectsDAO();
-        StudentsMarkDAO studentsMarkDAO = new StudentsMarkDAO();
+        SubjectDAO subjectDAO = new SubjectDAO();
+        SubjectDTO subjectDTO = new SubjectDTO();
+        StudentsMarksDAO studentsMarksDAO = new StudentsMarksDAO();
+        StudentsMarksDTO studentsMarksDTO = new StudentsMarksDTO();
 
         PrintWriter pw = response.getWriter();
 
@@ -44,7 +46,7 @@ public class WebAppServlet extends HttpServlet {
                 break;
 
             case "Marks":
-                showAllMarks(studentsMarkDAO, pw);
+                showAllMarks(studentsMarksDAO, pw);
                 break;
 
 //            case "AllMarksOneStudent":
@@ -180,11 +182,11 @@ public class WebAppServlet extends HttpServlet {
                 break;
 
             case "addMark":
-                String idStudent = request.getParameter("idStudent");
-                String idSubject = request.getParameter("idSubject");
+                String idStudent = request.getParameter("id_student");
+                String idSubject = request.getParameter("id_subject");
                 String mark = request.getParameter("mark");
                 try {
-                    studentsMarkDAO.create(new StudentsMarksDTO(Integer.parseInt(idStudent),Integer.parseInt(idSubject),Integer.parseInt(mark)));
+                    studentsMarksDAO.create(new StudentsMarksDTO(Integer.parseInt(idStudent),Integer.parseInt(idSubject),Integer.parseInt(mark)));
                     response.sendRedirect("Servlets.WebAppServlet?Marks=Show+all+marks&formName=Marks");
                     return;
                 } catch (DAOExceptions daoExceptions) {
@@ -193,11 +195,11 @@ public class WebAppServlet extends HttpServlet {
                 break;
 
             case "updateMark":
-                String idSt = request.getParameter("idStudent");
-                String idSub = request.getParameter("idStudent");
-                String upMark = request.getParameter("mark");
+                String idSt = request.getParameter("ID_Student");
+                String idSub = request.getParameter("ID_Subject");
+                String upMark = request.getParameter("Mark");
                 try {
-                    studentsMarkDAO.update(new StudentsMarksDTO(Integer.parseInt(idSt),Integer.parseInt(idSub),Integer.parseInt(upMark)));
+                    studentsMarksDAO.update(new StudentsMarksDTO(Integer.parseInt(idSt), Integer.parseInt(idSub), Integer.parseInt(upMark)));
                     response.sendRedirect("Servlets.WebAppServlet?Marks=Show+all+marks&formName=Marks");
                 } catch (DAOExceptions daoExceptions) {
                     daoExceptions.printStackTrace();
@@ -205,23 +207,22 @@ public class WebAppServlet extends HttpServlet {
                 break;
 
             case "confirmUpdateMark":
-                String idStud = request.getParameter("idStudent");
-                String idSubj = request.getParameter("idStudent");
+                String idStud = request.getParameter("ID_Student");
+                String idSubj = request.getParameter("ID_Subject");
                 pw.print("<h2>Update Mark</h2>");
                 pw.println("<form action=\"Servlets.WebAppServlet\">");
-                pw.println("ID Student <input type=\"text\" name=\"idStudent\" value=\"" + idStud + "\" readonly=\"readonly\"><br>");
-                pw.println("ID Subject <input type=\"text\" name=\"idStudent\" value=\"" + idSubj + "\" readonly=\"readonly\"><br>");
-                pw.println("Mark <input type=\"text\" name=\"mark\" value=\"\"><br>");
+                pw.println("ID_Student <input type=\"text\" name=\"ID_Student\" value=\"" + idStud + "\" readonly=\"readonly\"><br>");
+                pw.println("ID_Subject <input type=\"text\" name=\"ID_Subject\" value=\"" + idSubj + "\" readonly=\"readonly\"><br>");
+                pw.println("Mark <input type=\"text\" name=\"Mark\" value=\"\"><br>");
                 pw.println("<input type=\"hidden\" name=\"formName\" value=\"updateMark\">");
                 pw.println("<input type=\"submit\" value=\"Edit\"><br>");
                 pw.println("</form>");
-                pw.println("</table>");
                 break;
 
             case "deleteMark":
                 String delIdMark = request.getParameter("id");
                 try {
-                    studentsMarkDAO.delete(Integer.parseInt(delIdMark));
+                    studentsMarksDAO.delete(Integer.parseInt(delIdMark));
                     response.sendRedirect("Servlets.WebAppServlet?Marks=Show+all+marks&formName=Marks");
                 } catch (DAOExceptions daoExceptions) {
                     daoExceptions.printStackTrace();
@@ -273,7 +274,7 @@ public class WebAppServlet extends HttpServlet {
 
     }
 
-    private void showAllSubjects(SubjectsDAO subject, PrintWriter pw) throws ServletException {
+    private void showAllSubjects(SubjectDAO subject, PrintWriter pw) throws ServletException {
         pw.println("<h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List of subjects</h3>");
         pw.println("<table border width=25%>");
         try {
@@ -301,7 +302,7 @@ public class WebAppServlet extends HttpServlet {
         pw.println("</form>");
     }
 
-    private void showAllMarks(StudentsMarkDAO marks, PrintWriter pw) throws ServletException {
+    private void showAllMarks(StudentsMarksDAO marks, PrintWriter pw) throws ServletException {
         pw.println("<h3>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List of Marks</h3>");
         pw.println("<table border width=25%>");
         try {
@@ -314,7 +315,7 @@ public class WebAppServlet extends HttpServlet {
             pw.print("<th>Mark</th>");
             for (StudentsMarksDTO allMarks : l) {
                 pw.println("<tr>");
-                pw.println("<td><a href=\"Servlets.WebAppServlet?formName=confirmUpdateMark&id=" + allMarks.getId() + "\">Edit</a></td>");
+                pw.println("<td><a href=\"Servlets.WebAppServlet?formName=confirmUpdateMark\">Edit</a></td>");
                 pw.println("<td><a href=\"Servlets.WebAppServlet?formName=confirmDeleteMark&id=" + allMarks.getId() + "\">Delete</a></td>");
                 pw.println("<td>" + allMarks.getId() + "</td>");
                 pw.println("<td>" + allMarks.getIdStudent() + "</td>");
@@ -327,8 +328,8 @@ public class WebAppServlet extends HttpServlet {
         }
         pw.println("</table><br>");
         pw.println("<form action=\"Servlets.WebAppServlet\">");
-        pw.println("ID Student <input type=\"text\" name=\"idStudent\" value=\"\"><br>");
-        pw.println("ID Subject <input type=\"text\" name=\"idSubject\" value=\"\"><br>");
+        pw.println("ID Student <input type=\"text\" name=\"id_student\" value=\"\"><br>");
+        pw.println("ID Subject <input type=\"text\" name=\"id_subject\" value=\"\"><br>");
         pw.println("Mark <input type=\"text\" name=\"mark\" value=\"\"><br>");
         pw.println("<input type=\"hidden\" name=\"formName\" value=\"addMark\">");
         pw.println("<input type=\"submit\" value=\"Add new mark\"><br>");
