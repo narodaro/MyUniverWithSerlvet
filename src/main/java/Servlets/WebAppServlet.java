@@ -315,8 +315,8 @@ public class WebAppServlet extends HttpServlet {
             pw.print("<th>Mark</th>");
             for (StudentsMarksDTO allMarks : l) {
                 pw.println("<tr>");
-                pw.println("<td><a href=\"Servlets.WebAppServlet?formName=confirmUpdateMark&id_student=" + allMarks.getIdStudent()
-                        + "&id_subject=" + allMarks.getIdSubject() + "\">Edit</a></td>");
+                pw.println("<td><a href=\"Servlets.WebAppServlet?formName=confirmUpdateMark&id_student="
+                        + allMarks.getIdStudent() + "&id_subject=" + allMarks.getIdSubject() + "\">Edit</a></td>");
                 pw.println("<td><a href=\"Servlets.WebAppServlet?formName=confirmDeleteMark&id=" + allMarks.getId() + "\">Delete</a></td>");
                 pw.println("<td>" + allMarks.getId() + "</td>");
                 pw.println("<td>" + allMarks.getIdStudent() + "</td>");
