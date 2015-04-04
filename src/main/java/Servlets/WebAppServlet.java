@@ -195,8 +195,8 @@ public class WebAppServlet extends HttpServlet {
                 break;
 
             case "updateMark":
-                String idSt = request.getParameter("ID_Student");
-                String idSub = request.getParameter("ID_Subject");
+                String idSt = request.getParameter("id_student");
+                String idSub = request.getParameter("id_subject");
                 String upMark = request.getParameter("Mark");
                 try {
                     studentsMarksDAO.update(new StudentsMarksDTO(Integer.parseInt(idSt), Integer.parseInt(idSub), Integer.parseInt(upMark)));
@@ -207,12 +207,12 @@ public class WebAppServlet extends HttpServlet {
                 break;
 
             case "confirmUpdateMark":
-                String idStud = request.getParameter("ID_Student");
-                String idSubj = request.getParameter("ID_Subject");
+                String idStud = request.getParameter("id_student");
+                String idSubj = request.getParameter("id_subject");
                 pw.print("<h2>Update Mark</h2>");
                 pw.println("<form action=\"Servlets.WebAppServlet\">");
-                pw.println("ID_Student <input type=\"text\" name=\"ID_Student\" value=\"" + idStud + "\" readonly=\"readonly\"><br>");
-                pw.println("ID_Subject <input type=\"text\" name=\"ID_Subject\" value=\"" + idSubj + "\" readonly=\"readonly\"><br>");
+                pw.println("ID_Student <input type=\"text\" name=\"id_student\" value=\"" + idStud + "\" readonly=\"readonly\"><br>");
+                pw.println("ID_Subject <input type=\"text\" name=\"id_subject\" value=\"" + idSubj + "\" readonly=\"readonly\"><br>");
                 pw.println("Mark <input type=\"text\" name=\"Mark\" value=\"\"><br>");
                 pw.println("<input type=\"hidden\" name=\"formName\" value=\"updateMark\">");
                 pw.println("<input type=\"submit\" value=\"Edit\"><br>");
@@ -315,7 +315,8 @@ public class WebAppServlet extends HttpServlet {
             pw.print("<th>Mark</th>");
             for (StudentsMarksDTO allMarks : l) {
                 pw.println("<tr>");
-                pw.println("<td><a href=\"Servlets.WebAppServlet?formName=confirmUpdateMark\">Edit</a></td>");
+                pw.println("<td><a href=\"Servlets.WebAppServlet?formName=confirmUpdateMark&id_student="
+                        + allMarks.getIdStudent() + "&id_subject=" + allMarks.getIdSubject() + "\">Edit</a></td>");
                 pw.println("<td><a href=\"Servlets.WebAppServlet?formName=confirmDeleteMark&id=" + allMarks.getId() + "\">Delete</a></td>");
                 pw.println("<td>" + allMarks.getId() + "</td>");
                 pw.println("<td>" + allMarks.getIdStudent() + "</td>");
