@@ -1,8 +1,10 @@
 package Servlets;
 
+import dao.DaoObjects;
 import dao.StudentDAO;
 import dao.StudentsMarksDAO;
 import dao.SubjectDAO;
+import dbConnection.DBConnection;
 import dto.StudentDTO;
 import dto.StudentsMarksDTO;
 import dto.SubjectDTO;
@@ -18,8 +20,13 @@ import java.util.List;
 
 public class WebAppServlet extends HttpServlet {
 
+    private static DaoObjects daoObjects = new DaoObjects();
+    private static DBConnection dbConnection = new DBConnection();
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=utf-8");
+
+
 
         StudentDAO studentDAO = new StudentDAO();
         SubjectDAO subjectDAO = new SubjectDAO();
@@ -240,6 +247,9 @@ public class WebAppServlet extends HttpServlet {
                 break;
 
         }
+
+        daoObjects.psClose();
+        dbConnection.closeConnection();
     }
 
     private void showAllStudents(StudentDAO student, PrintWriter pw) throws ServletException {
