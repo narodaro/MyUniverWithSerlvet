@@ -1,3 +1,4 @@
+
 package Servlets;
 
 import dao.DaoObjects;
@@ -20,20 +21,19 @@ import java.util.List;
 
 public class WebAppServlet extends HttpServlet {
 
+    private static StudentDAO studentDAO = new StudentDAO();
+    private static StudentDTO studentDTO = new StudentDTO();
+    private static SubjectDAO subjectDAO = new SubjectDAO();
+    private static SubjectDTO subjectDTO = new SubjectDTO();
+    private static StudentsMarksDAO studentsMarksDAO = new StudentsMarksDAO();
+    private static StudentsMarksDTO studentsMarksDTO = new StudentsMarksDTO();
+
     private static DaoObjects daoObjects = new DaoObjects();
     private static DBConnection dbConnection = new DBConnection();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         response.setContentType("text/html;charset=utf-8");
-
-
-
-        StudentDAO studentDAO = new StudentDAO();
-        SubjectDAO subjectDAO = new SubjectDAO();
-        SubjectDTO subjectDTO = new SubjectDTO();
-        StudentsMarksDAO studentsMarksDAO = new StudentsMarksDAO();
-        StudentsMarksDTO studentsMarksDTO = new StudentsMarksDTO();
-
         PrintWriter pw = response.getWriter();
 
         String inputParameter = request.getParameter("formName");
@@ -56,6 +56,18 @@ public class WebAppServlet extends HttpServlet {
                 showAllMarks(studentsMarksDAO, pw);
                 break;
 
+            case "BackToStudents":
+                response.sendRedirect("Servlets.WebAppServlet?Students=Students&formName=Students");
+                break;
+
+            case "BackToSubjects":
+                response.sendRedirect("Servlets.WebAppServlet?Subjects=Subjects&formName=Subjects");
+                break;
+
+            case "BackToMarks":
+                response.sendRedirect("Servlets.WebAppServlet?Marks=Show+all+marks&formName=Marks");
+                break;
+
 //            case "AllMarksOneStudent":
 //                String results = request.getParameter("ID");
 //                Map<StudentDTO,Map<SubjectDTO,StudentsMarksDTO>> allmarks = null;
@@ -68,22 +80,26 @@ public class WebAppServlet extends HttpServlet {
 //                break;
 
             case "addStudent":
+                studentDTO.setFirstName(request.getParameter("FirstName"));
+                studentDTO.setSecondName(request.getParameter("SecondName"));
                 try {
-                    studentDAO.create(new StudentDTO(request.getParameter("FirstName"), request.getParameter("SecondName")));
-                    response.sendRedirect("Servlets.WebAppServlet?Students=Students&formName=Students");
-                    return;
+                    studentDAO.create(studentDTO);
                 } catch (DAOExceptions daoExceptions) {
+                    MessegeStudents(pw);
                     daoExceptions.printStackTrace();
                 }
+                response.sendRedirect("Servlets.WebAppServlet?Students=Students&formName=Students");
                 break;
 
             case "updateStudent":
                 String studIDEdit = request.getParameter("ID");
+                studentDTO.setFirstName(request.getParameter("firstName"));
+                studentDTO.setSecondName(request.getParameter("secondName"));
+                response.sendRedirect("Servlets.WebAppServlet?Students=Students&formName=Students");
                 try {
-                    studentDAO.update(new StudentDTO(request.getParameter("firstName"), request.getParameter("secondName")),
-                            Integer.parseInt(studIDEdit));
-                    response.sendRedirect("Servlets.WebAppServlet?Students=Students&formName=Students");
+                    studentDAO.update(studentDTO, Integer.parseInt(studIDEdit));
                 } catch (DAOExceptions daoExceptions) {
+                    MessegeStudents(pw);
                     daoExceptions.printStackTrace();
                 }
                 break;
@@ -104,10 +120,11 @@ public class WebAppServlet extends HttpServlet {
                 String studIDDel = request.getParameter("ID");
                 try {
                     studentDAO.delete(Integer.parseInt(studIDDel));
-                    response.sendRedirect("Servlets.WebAppServlet?Students=Students&formName=Students");
                 } catch (DAOExceptions daoExceptions) {
+                    MessegeStudents(pw);
                     daoExceptions.printStackTrace();
                 }
+                response.sendRedirect("Servlets.WebAppServlet?Students=Students&formName=Students");
                 break;
 
             case "confirmDelStudent":
@@ -120,6 +137,7 @@ public class WebAppServlet extends HttpServlet {
                     pw.print("<input type=\"submit\" value=\"Delete " + studentDAO.read(Integer.parseInt(studID)).getFirstName()
                             + " " + studentDAO.read(Integer.parseInt(studID)).getSecondName() + "\">");
                 } catch (DAOExceptions daoExceptions) {
+                    MessegeStudents(pw);
                     daoExceptions.printStackTrace();
                 }
                 pw.print("</form>");
@@ -130,23 +148,26 @@ public class WebAppServlet extends HttpServlet {
                 break;
 
             case "addSubject":
+                subjectDTO.setSubject_name(request.getParameter("Subject"));
                 try {
-                    subjectDAO.create(new SubjectDTO(request.getParameter("Subject")));
-                    response.sendRedirect("Servlets.WebAppServlet?Subjects=Subjects&formName=Subjects");
-                    return;
+                    subjectDAO.create(subjectDTO);
                 } catch (DAOExceptions daoExceptions) {
+                    MessageSubjects(pw);
                     daoExceptions.printStackTrace();
                 }
+                response.sendRedirect("Servlets.WebAppServlet?Subjects=Subjects&formName=Subjects");
                 break;
 
             case "updateSubject":
                 String sbIDEdit = request.getParameter("id");
+                subjectDTO.setSubject_name(request.getParameter("subject_name"));
                 try {
-                    subjectDAO.update(new SubjectDTO(request.getParameter("subject_name")), Integer.parseInt(sbIDEdit));
-                    response.sendRedirect("Servlets.WebAppServlet?Subjects=Subjects&formName=Subjects");
+                    subjectDAO.update(subjectDTO, Integer.parseInt(sbIDEdit));
                 } catch (DAOExceptions daoExceptions) {
+                    MessageSubjects(pw);
                     daoExceptions.printStackTrace();
                 }
+                response.sendRedirect("Servlets.WebAppServlet?Subjects=Subjects&formName=Subjects");
                 break;
 
             case "confirmUpdateSubject":
@@ -166,6 +187,7 @@ public class WebAppServlet extends HttpServlet {
                     subjectDAO.delete(Integer.parseInt(sbjIDDel));
                     response.sendRedirect("Servlets.WebAppServlet?Subjects=Subjects&formName=Subjects");
                 } catch (DAOExceptions daoExceptions) {
+                    MessageSubjects(pw);
                     daoExceptions.printStackTrace();
                 }
                 break;
@@ -179,6 +201,7 @@ public class WebAppServlet extends HttpServlet {
                 try {
                     pw.print("<input type=\"submit\" value=\"Delete " + subjectDAO.read(Integer.parseInt(sbjID)).getSubject_name() + "\">");
                 } catch (DAOExceptions daoExceptions) {
+                    MessageSubjects(pw);
                     daoExceptions.printStackTrace();
                 }
                 pw.print("</form>");
@@ -188,27 +211,45 @@ public class WebAppServlet extends HttpServlet {
                 showAllStudents(studentDAO, pw);
                 break;
 
+//            case "addStudent":
+//                studentDTO.setFirstName(request.getParameter("FirstName"));
+//                studentDTO.setSecondName(request.getParameter("SecondName"));
+//                try {
+//                    studentDAO.create(studentDTO);
+//                } catch (DAOExceptions daoExceptions) {
+//                    daoExceptions.printStackTrace();
+//                }
+//                response.sendRedirect("Servlets.WebAppServlet?Students=Students&formName=Students");
+//                break;
+
             case "addMark":
                 String idStudent = request.getParameter("id_student");
                 String idSubject = request.getParameter("id_subject");
                 String mark = request.getParameter("mark");
+                studentsMarksDTO.setIdStudent(Integer.parseInt(idStudent));
+                studentsMarksDTO.setIdSubject(Integer.parseInt(idSubject));
+                studentsMarksDTO.setMark(Integer.parseInt(mark));
                 try {
-                    studentsMarksDAO.create(new StudentsMarksDTO(Integer.parseInt(idStudent),Integer.parseInt(idSubject),Integer.parseInt(mark)));
-                    response.sendRedirect("Servlets.WebAppServlet?Marks=Show+all+marks&formName=Marks");
-                    return;
+                    studentsMarksDAO.create(studentsMarksDTO);
                 } catch (DAOExceptions daoExceptions) {
+                    MessageMarks(pw);
                     daoExceptions.printStackTrace();
                 }
+                response.sendRedirect("Servlets.WebAppServlet?Marks=Show+all+marks&formName=Marks");
                 break;
 
             case "updateMark":
                 String idSt = request.getParameter("id_student");
                 String idSub = request.getParameter("id_subject");
                 String upMark = request.getParameter("Mark");
+                studentsMarksDTO.setIdStudent(Integer.parseInt(idSt));
+                studentsMarksDTO.setIdSubject(Integer.parseInt(idSub));
+                studentsMarksDTO.setMark(Integer.parseInt(upMark));
                 try {
-                    studentsMarksDAO.update(new StudentsMarksDTO(Integer.parseInt(idSt), Integer.parseInt(idSub), Integer.parseInt(upMark)));
+                    studentsMarksDAO.update(studentsMarksDTO);
                     response.sendRedirect("Servlets.WebAppServlet?Marks=Show+all+marks&formName=Marks");
                 } catch (DAOExceptions daoExceptions) {
+                    MessageMarks(pw);
                     daoExceptions.printStackTrace();
                 }
                 break;
@@ -232,6 +273,7 @@ public class WebAppServlet extends HttpServlet {
                     studentsMarksDAO.delete(Integer.parseInt(delIdMark));
                     response.sendRedirect("Servlets.WebAppServlet?Marks=Show+all+marks&formName=Marks");
                 } catch (DAOExceptions daoExceptions) {
+                    MessageMarks(pw);
                     daoExceptions.printStackTrace();
                 }
                 break;
@@ -247,9 +289,32 @@ public class WebAppServlet extends HttpServlet {
                 break;
 
         }
-
         daoObjects.psClose();
         dbConnection.closeConnection();
+    }
+
+    private void MessageMarks(PrintWriter pw) {
+        pw.println("<form action=\"Servlets.WebAppServlet\">");
+        pw.println("<h2 style=\"color:red;\">Error</h2>");
+        pw.println("<input type=\"submit\" value=\"Back\"><br>");
+        pw.println("<input type=\"hidden\" name=\"formName\" value=\"BackToMarks\">");
+        pw.println("</form>");
+    }
+
+    private void MessageSubjects(PrintWriter pw) {
+        pw.println("<form action=\"Servlets.WebAppServlet\">");
+        pw.println("<h2 style=\"color:red;\">Error</h2>");
+        pw.println("<input type=\"submit\" value=\"Back\"><br>");
+        pw.println("<input type=\"hidden\" name=\"formName\" value=\"BackToSubjects\">");
+        pw.println("</form>");
+    }
+
+    private void MessegeStudents(PrintWriter pw) {
+        pw.println("<form action=\"Servlets.WebAppServlet\">");
+        pw.println("<h2 style=\"color:red;\">Error</h2>");
+        pw.println("<input type=\"submit\" value=\"Back\"><br>");
+        pw.println("<input type=\"hidden\" name=\"formName\" value=\"BackToStudents\">");
+        pw.println("</form>");
     }
 
     private void showAllStudents(StudentDAO student, PrintWriter pw) throws ServletException {
@@ -280,8 +345,10 @@ public class WebAppServlet extends HttpServlet {
         pw.println("Last Name <input type=\"text\" name=\"SecondName\" value=\"\"><br>");
         pw.println("<input type=\"hidden\" name=\"formName\" value=\"addStudent\">");
         pw.println("<input type=\"submit\" value=\"Add new student\"><br>");
-        pw.println("</form>");
-
+        pw.println("</form><p>");
+        pw.println("<form action=\"http://localhost:8080/University.html\">");
+        pw.println("<input type=\"submit\" value=\"Back to main\"><br>");
+        pw.println("</form><p>");
     }
 
     private void showAllSubjects(SubjectDAO subject, PrintWriter pw) throws ServletException {
@@ -310,6 +377,9 @@ public class WebAppServlet extends HttpServlet {
         pw.println("<input type=\"submit\" value=\"Add new subject\"><br>");
         pw.println("<input type=\"hidden\" name=\"formName\" value=\"addSubject\">");
         pw.println("</form>");
+        pw.println("<form action=\"http://localhost:8080/University.html\">");
+        pw.println("<input type=\"submit\" value=\"Back to main\"><br>");
+        pw.println("</form><p>");
     }
 
     private void showAllMarks(StudentsMarksDAO marks, PrintWriter pw) throws ServletException {
@@ -345,6 +415,9 @@ public class WebAppServlet extends HttpServlet {
         pw.println("<input type=\"hidden\" name=\"formName\" value=\"addMark\">");
         pw.println("<input type=\"submit\" value=\"Add new mark\"><br>");
         pw.println("</form>");
+        pw.println("<form action=\"http://localhost:8080/University.html\">");
+        pw.println("<input type=\"submit\" value=\"Back to main\"><br>");
+        pw.println("</form><p>");
         pw.println("</table>");
     }
 
