@@ -17,7 +17,8 @@ public class DaoObjects {
     public void closePSifNotNULL(PreparedStatement ps) {
         try {
             if (ps != null) {
-                ps.close();            }
+                ps.close();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
