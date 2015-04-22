@@ -4,6 +4,7 @@ import dto.SubjectDTO;
 import dao.interfaces.ObligationSubject;
 import myExceptions.DAOExceptions;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,9 +20,7 @@ public class SubjectDAO extends DaoObjects implements ObligationSubject {
 
     public SubjectDTO create(SubjectDTO Subject) throws DAOExceptions {
         try {
-            if (psINSERT == null) {
-                psINSERT = conn.prepareStatement(SQL_INSERT);
-            }
+            getPSCreate();
             psINSERT.setString(1, Subject.getSubject_name());
             psINSERT.executeUpdate();
         } catch (SQLException e) {
@@ -34,9 +33,7 @@ public class SubjectDAO extends DaoObjects implements ObligationSubject {
         ResultSet res;
         SubjectDTO subject;
         try {
-            if (psREAD == null) {
-                psREAD = conn.prepareStatement(SQL_READ);
-            }
+            getPSRead();
             psREAD.setInt(1, key);
             res = psREAD.executeQuery();
 
@@ -54,9 +51,7 @@ public class SubjectDAO extends DaoObjects implements ObligationSubject {
 
     public void delete(int key) throws DAOExceptions {
         try {
-            if (psDELETE == null) {
-                psDELETE = conn.prepareStatement(SQL_DELETE);
-            }
+            getPSDelete();
             psDELETE.setInt(1, key);
             psDELETE.executeUpdate();
         } catch (SQLException e) {
@@ -66,9 +61,7 @@ public class SubjectDAO extends DaoObjects implements ObligationSubject {
 
     public void update(SubjectDTO Subject, int key) throws DAOExceptions {
         try {
-            if (psUPDATE == null) {
-                psUPDATE = conn.prepareStatement(SQL_UPDATE);
-            }
+            getPSUpdate();
             psUPDATE.setString(1, Subject.getSubject_name());
             psUPDATE.setInt(2, key);
             psUPDATE.executeUpdate();
@@ -81,9 +74,7 @@ public class SubjectDAO extends DaoObjects implements ObligationSubject {
     public List<SubjectDTO> readall() throws DAOExceptions {
         List<SubjectDTO> subjects;
         try {
-            if (psREADALL == null) {
-                psREADALL = conn.prepareStatement(SQL_READALL);
-            }
+            getPSReadAll();
 
             subjects = new ArrayList<>();
             ResultSet res = psREADALL.executeQuery();
@@ -99,5 +90,40 @@ public class SubjectDAO extends DaoObjects implements ObligationSubject {
             throw new DAOExceptions("Dao error", e);
         }
         return subjects;
+    }
+
+    private PreparedStatement getPSCreate() throws SQLException {
+        if (psINSERT == null) {
+            psINSERT = conn.prepareStatement(SQL_INSERT);
+        }
+        return psINSERT;
+    }
+
+    private PreparedStatement getPSRead() throws SQLException {
+        if (psREAD == null) {
+            psREAD = conn.prepareStatement(SQL_READ);
+        }
+        return psREAD;
+    }
+
+    private PreparedStatement getPSDelete() throws SQLException {
+        if (psDELETE == null) {
+            psDELETE = conn.prepareStatement(SQL_DELETE);
+        }
+        return psDELETE;
+    }
+
+    private PreparedStatement getPSUpdate() throws SQLException {
+        if (psUPDATE == null) {
+            psUPDATE = conn.prepareStatement(SQL_UPDATE);
+        }
+        return psUPDATE;
+    }
+
+    private PreparedStatement getPSReadAll() throws SQLException {
+        if (psREADALL == null) {
+            psREADALL = conn.prepareStatement(SQL_READALL);
+        }
+        return psREADALL;
     }
 }

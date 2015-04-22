@@ -6,6 +6,7 @@ import dto.SubjectDTO;
 import dao.interfaces.ObligationStudentsMark;
 import myExceptions.DAOExceptions;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -29,9 +30,7 @@ public class StudentsMarksDAO extends DaoObjects implements ObligationStudentsMa
 
     public StudentsMarksDTO create(StudentsMarksDTO mark) throws DAOExceptions {
         try {
-            if (psINSERT == null) {
-                psINSERT = conn.prepareStatement(SQL_INSERT);
-            }
+            getPSCreate();
             psINSERT.setInt(1, mark.getIdStudent());
             psINSERT.setInt(2, mark.getIdSubject());
             psINSERT.setInt(3, mark.getMark());
@@ -45,9 +44,7 @@ public class StudentsMarksDAO extends DaoObjects implements ObligationStudentsMa
     public Map<StudentDTO, Map<SubjectDTO, StudentsMarksDTO>> read(int key) throws DAOExceptions {
         Map<StudentDTO, Map<SubjectDTO, StudentsMarksDTO>> allTheMarksOfOneStudent;
         try {
-            if (psREAD == null) {
-                psREAD = conn.prepareStatement(SQL_READ);
-            }
+            getPSRead();
             psREAD.setInt(1, key);
             ResultSet res = psREAD.executeQuery();
 
@@ -76,9 +73,7 @@ public class StudentsMarksDAO extends DaoObjects implements ObligationStudentsMa
 
     public void delete(int key) throws DAOExceptions {
         try {
-            if (psDELETE == null) {
-                psDELETE = conn.prepareStatement(SQL_DELETE);
-            }
+            getPSDelete();
             psDELETE.setInt(1, key);
             psDELETE.executeUpdate();
         } catch (SQLException e) {
@@ -88,9 +83,7 @@ public class StudentsMarksDAO extends DaoObjects implements ObligationStudentsMa
 
     public void update(StudentsMarksDTO mark) throws DAOExceptions {
         try {
-            if (psUPDATE == null) {
-                psUPDATE = conn.prepareStatement(SQL_UPDATE);
-            }
+            getPSUpdate();
             psUPDATE.setInt(1, mark.getMark());
             psUPDATE.setInt(2, mark.getIdSubject());
             psUPDATE.setInt(3, mark.getIdStudent());
@@ -103,9 +96,7 @@ public class StudentsMarksDAO extends DaoObjects implements ObligationStudentsMa
     public List<StudentsMarksDTO> readall() throws DAOExceptions {
         List<StudentsMarksDTO> marks = new ArrayList<>();
         try {
-            if (psREADALL == null) {
-                psREADALL = conn.prepareStatement(SQL_READALL);
-            }
+            getPSReadAll();
             ResultSet res = psREADALL.executeQuery();
 
             while (res.next()) {
@@ -121,5 +112,40 @@ public class StudentsMarksDAO extends DaoObjects implements ObligationStudentsMa
             throw new DAOExceptions("Dao error", e);
         }
         return marks;
+    }
+
+    private PreparedStatement getPSCreate() throws SQLException {
+        if (psINSERT == null) {
+            psINSERT = conn.prepareStatement(SQL_INSERT);
+        }
+        return psINSERT;
+    }
+
+    private PreparedStatement getPSRead() throws SQLException {
+        if (psREAD == null) {
+            psREAD = conn.prepareStatement(SQL_READ);
+        }
+        return psREAD;
+    }
+
+    private PreparedStatement getPSDelete() throws SQLException {
+        if (psDELETE == null) {
+            psDELETE = conn.prepareStatement(SQL_DELETE);
+        }
+        return psDELETE;
+    }
+
+    private PreparedStatement getPSUpdate() throws SQLException {
+        if (psUPDATE == null) {
+            psUPDATE = conn.prepareStatement(SQL_UPDATE);
+        }
+        return psUPDATE;
+    }
+
+    private PreparedStatement getPSReadAll() throws SQLException {
+        if (psREADALL == null) {
+            psREADALL = conn.prepareStatement(SQL_READALL);
+        }
+        return psREADALL;
     }
 }
