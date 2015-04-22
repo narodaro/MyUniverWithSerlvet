@@ -66,7 +66,7 @@
     <form action="Servlets.WebAppServlet">
         <tr>
             <td>ID Student <input type="text" name="id_student" value="" size="2"></td>
-            <td><input type="hidden" name="formName" value="addMark">
+            <td><input type="hidden" name="formName" value="AllMarksOneStudent">
             <td><input type="submit" value="Show results"></td>
         </tr>
     </form>
